@@ -1,0 +1,160 @@
+{# templates/admin/dashboard.html.twig #}
+
+{% extends '@EasyAdmin/layout.html.twig' %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            {# Card pour Type de Contenu #}
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Type de Contenu</h5>
+                        <p class="card-text">Nombre total: {{ typeContenuCount }}</p>
+                        <a href="{{ ea_url()
+                                    .setController('App\\Controller\\Admin\\TypeContenuCrudController')
+                                    .setAction('index')
+                                }}">
+                                Voir les détails
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+            {# Card pour Contenu #}
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Contenu</h5>
+                        <p class="card-text">Nombre total: {{ contenuCount }}</p>
+                        <a href="{{ ea_url()
+                                    .setController('App\\Controller\\Admin\\ContenuCrudController')
+                                    .setAction('index')
+                                }}">
+                                Voir les détails
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Card pour Liens #}
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Texte annexe</h5>
+                        <p class="card-text">Nombre total: {{ lienCount }}</p>
+                        <a href="{{ ea_url()
+                                    .setController('App\\Controller\\Admin\\LienCrudController')
+                                    .setAction('index')
+                                }}">
+                                Voir les détails
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+
+            {# Card pour Actualités #}
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Actualités/Blog</h5>
+                        <p class="card-text">Nombre total: {{ actualiteCount }}</p>
+                        <a href="{{ ea_url()
+                                    .setController('App\\Controller\\Admin\\ActualiteCrudController')
+                                    .setAction('index')
+                                }}">
+                                Voir les détails
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Card pour Agenda #}
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Actualités/Blog</h5>
+                        <p class="card-text">Nombre total: {{ agendaCount }}</p>
+                         <a href="{{ ea_url()
+                                    .setController('App\\Controller\\Admin\\AgendaCrudController')
+                                    .setAction('index')
+                                }}">
+                                Voir les détails
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Card pour Type d'Artiste #}
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Categorie Jeux et Animations</h5>
+                        <p class="card-text">Nombre total: {{ typeArtisteCount }}</p>
+                        <a href="{{ ea_url()
+                                    .setController('App\\Controller\\Admin\\TypeArtisteCrudController')
+                                    .setAction('index')
+                                }}">
+                                Voir les détails
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            {# Card pour Artistes #}
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Jeux et Animations</h5>
+                        <p class="card-text">Nombre total: {{ artisteCount }}</p>
+                        <a href="{{ ea_url()
+                                    .setController('App\\Controller\\Admin\\ArtisteCrudController')
+                                    .setAction('index')
+                                }}">
+                                Voir les détails
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Card pour Type de Galerie #}
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Types / Catégories</h5>
+                        <p class="card-text">Nombre total: {{ typeGalerieCount }}</p>
+                        <a href="{{ ea_url()
+                                    .setController('App\\Controller\\Admin\\TypeGalerieCrudController')
+                                    .setAction('index')
+                                }}">
+                                Voir les détails
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Card pour Galeries #}
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Bons Plans</h5>
+                        <p class="card-text">Nombre total: {{ galerieCount }}</p>
+                        <a href="{{ ea_url()
+                                    .setController('App\\Controller\\Admin\\GalerieCrudController')
+                                    .setAction('index')
+                                }}">
+                                Voir les détails
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

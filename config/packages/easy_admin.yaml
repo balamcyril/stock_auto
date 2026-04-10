@@ -1,0 +1,10 @@
+easy_admin:
+    design:
+        form_theme:
+            - '@EasyAdmin/form/bootstrap_5.html.twig'
+            - '@FOSCKEditor/Form/ckeditor_widget.html.twig' # Activer CKEditor
+        assets:
+            css:
+                - 'styles/ckeditor.css' # Optionnel : pour des styles personnalisés
+            js:
+                - 'build/ckeditor.js' # Chemin vers votre fichier de configuration CKEditor

@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion - Administration{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="login-container">
+    <div class="login-card">
+        <h2>Connexion à l'Administration</h2>
+
+        {% if error %}
+            <div class="alert alert-danger">
+                Identifiants invalides. Veuillez réessayer.
+            </div>
+        {% endif %}
+
+        <form method="post">
+            <div class="input-group">
+                <label for="username">Email</label>
+                <input type="text" id="username" name="_username" value="{{ last_username }}" required autofocus>
+            </div>
+
+            <div class="input-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="_password" required>
+            </div>
+
+            <button type="submit" class="login-btn">Se connecter</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -4,6 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    easyadmin_thumbnails_base_path: '%env(APP_PUBLIC_URL)%/media/cache/resolve/thumbnail_800x570'
 
 services:
     # default configuration for services in *this* file
@@ -22,3 +23,11 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Service\ImageThumbnailGenerator:
+        arguments:
+            $cacheManager: '@liip_imagine.cache.manager'
+            $urlGenerator: '@router.default'
+
+    App\EventSubscriber\ImageThumbnailSubscriber:
+        tags:
+            - { name: doctrine.event_subscriber }

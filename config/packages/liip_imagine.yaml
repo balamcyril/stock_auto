@@ -1,0 +1,11 @@
+liip_imagine:
+    driver: "gd" # Ou "imagick" si disponible, pour meilleure qualité
+    filter_sets:
+        # Redimensionnement + Compression
+        thumbnail_800x570:
+            quality: 80 # Compression (0-100, plus bas = plus léger)
+            filters:
+                thumbnail:
+                    size: [800, 570]
+                    mode: outbound # Coupe pour remplir la taille
+                strip: ~ # Supprime les métadonnées inutiles
