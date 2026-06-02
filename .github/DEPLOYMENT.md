@@ -70,7 +70,10 @@ L'authentification par mot de passe en GitHub Actions présente des risques :
 | `SSH_USER` | Utilisateur SSH | `deployer` |
 | `SSH_PORT` | Port SSH (défaut: 22) | `22` |
 | `DEPLOY_PATH` | Chemin d'accès au projet | `/var/www/stock_auto` |
-| `SLACK_WEBHOOK` | (Optionnel) Webhook Slack | `https://hooks.slack.com/...` |
+| `DATABASE_URL` | URL de connexion à la base de données | `mysql://user:pass@host:3306/dbname?serverVersion=8.2` |
+| `APP_SECRET` | Secret Symfony unique | `cc3a5eb2061c7f5b320e2bf0e26a8581` |
+| `JWT_PASSPHRASE` | Passphrase JWT pour l'authentification | `your-jwt-passphrase` |
+| `CORS_ALLOW_ORIGIN` | Pattern CORS pour la production | `^https?://yourdomain\.com(:[0-9]+)?$` |
 
 Le workflow est déjà configuré pour utiliser `sshpass` automatiquement.
 
@@ -100,6 +103,20 @@ sudo chmod -R 755 /var/www/stock_auto/public
 sudo chmod -R 777 /var/www/stock_auto/var
 sudo chmod -R 777 /var/www/stock_auto/public/uploads
 ```
+
+#### Générer les secrets de production requis
+
+Avant le premier déploiement, générez les secrets uniques :
+
+```bash
+# APP_SECRET (chaîne hex aléatoire)
+php -r 'echo bin2hex(random_bytes(16)) . "\n";'
+
+# JWT_PASSPHRASE (chaîne aléatoire pour JWT)
+php -r 'echo bin2hex(random_bytes(32)) . "\n";'
+```
+
+Copier les valeurs générées dans les secrets GitHub correspondants.
 
 #### Installer les dépendances sur le serveur
 

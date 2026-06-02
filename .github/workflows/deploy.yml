@@ -23,7 +23,7 @@ jobs:
 
       - name: Deploy to server
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} << 'EOF'
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} << EOF
           set -e
           
           DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
@@ -34,27 +34,27 @@ jobs:
           git config --global user.name "GitHub Deploy"
           
           # Create deploy directory if it doesn't exist
-          if [ ! -d "$DEPLOY_PATH" ]; then
-            echo "Creating deployment directory: $DEPLOY_PATH"
-            echo "$SSH_PASSWORD" | sudo -S mkdir -p "$DEPLOY_PATH"
-            echo "$SSH_PASSWORD" | sudo -S chown -R $(whoami):$(whoami) "$DEPLOY_PATH"
-            cd "$DEPLOY_PATH"
+          if [ ! -d "\$DEPLOY_PATH" ]; then
+            echo "Creating deployment directory: \$DEPLOY_PATH"
+            echo "\$SSH_PASSWORD" | sudo -S mkdir -p "\$DEPLOY_PATH"
+            echo "\$SSH_PASSWORD" | sudo -S chown -R \$(whoami):\$(whoami) "\$DEPLOY_PATH"
+            cd "\$DEPLOY_PATH"
             git init
             git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
             git fetch origin
             git checkout ${{ github.ref_name }}
           else
-            cd "$DEPLOY_PATH"
+            cd "\$DEPLOY_PATH"
             # Update remote URL in case it changed
             git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           fi
           
           # Backup uploaded files before git pull
           echo "Backing up uploaded files..."
-          BACKUP_DIR="/tmp/uploads_backup_$(date +%s)"
-          mkdir -p "$BACKUP_DIR"
+          BACKUP_DIR="/tmp/uploads_backup_\$(date +%s)"
+          mkdir -p "\$BACKUP_DIR"
           if [ -d "public/uploads" ]; then
-            cp -r public/uploads/* "$BACKUP_DIR/" 2>/dev/null || true
+            cp -r public/uploads/* "\$BACKUP_DIR/" 2>/dev/null || true
           fi
           
           # Pull latest code
@@ -63,7 +63,7 @@ jobs:
           git pull origin ${{ github.ref_name }}
           
           # Fix permissions on entire directory after git pull
-          echo "$SSH_PASSWORD" | sudo -S chmod -R 777 "$DEPLOY_PATH"
+          echo "\$SSH_PASSWORD" | sudo -S chmod -R 777 "\$DEPLOY_PATH"
           
           # Restore uploaded files
           echo "Restoring uploaded files..."
@@ -72,24 +72,35 @@ jobs:
           mkdir -p public/uploads/sub_categories
           mkdir -p public/uploads/brands
           
-          if [ -d "$BACKUP_DIR" ]; then
-            cp -r "$BACKUP_DIR"/* public/uploads/ 2>/dev/null || true
-            rm -rf "$BACKUP_DIR"
+          if [ -d "\$BACKUP_DIR" ]; then
+            cp -r "\$BACKUP_DIR"/* public/uploads/ 2>/dev/null || true
+            rm -rf "\$BACKUP_DIR"
           fi
           
-          # Install dependencies
-          composer install --no-dev --optimize-autoloader
+          # Create or update .env.prod.local with production secrets
+          cat > .env.prod.local << 'SECRETS_EOF'
+          DATABASE_URL="${{ secrets.DATABASE_URL }}"
+          APP_SECRET="${{ secrets.APP_SECRET }}"
+          JWT_PASSPHRASE="${{ secrets.JWT_PASSPHRASE }}"
+          CORS_ALLOW_ORIGIN="${{ secrets.CORS_ALLOW_ORIGIN }}"
+          SECRETS_EOF
+          
+          # Clean vendor and reinstall for production (removes dev dependencies)
+          rm -rf vendor/
+          
+          # Install dependencies for production only
+          composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
           npm ci
           npm run build
           
           # Generate optimized .env.prod.php for production
-          composer dump-env prod
+          APP_ENV=prod composer dump-env prod
           
           # Clear cache
-          php bin/console cache:clear --env=prod
+          APP_ENV=prod php bin/console cache:clear
           
           # Run migrations if needed
-          php bin/console doctrine:migrations:migrate --no-interaction --env=prod
+          APP_ENV=prod php bin/console doctrine:migrations:migrate --no-interaction
           
           # Fix permissions
           chmod -R 755 public/
