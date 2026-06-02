@@ -1,0 +1,150 @@
+{
+  "info": {
+    "name": "Stock Auto API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection Postman pour tester l'API Stock Auto sur http://176.169.64.45/public"
+  },
+  "item": [
+    {
+      "name": "Register user",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"Jean\",\n  \"lastName\": \"Dupont\",\n  \"email\": \"jean@example.com\",\n  \"password\": \"TestPass123!\",\n  \"phone\": \"+33612345678\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/register",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "register"
+          ]
+        }
+      }
+    },
+    {
+      "name": "JWT login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "  var jsonData = pm.response.json();",
+              "  if (jsonData.token) {",
+              "    pm.environment.set('jwt_token', jsonData.token);",
+              "  }",
+              "}"]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"P@ssw0rd123\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/login_check",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "login_check"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get API root",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/ld+json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get products",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/ld+json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/products",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "products"
+          ]
+        }
+      }
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": []
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "exec": []
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://176.169.64.45/public"
+    },
+    {
+      "key": "jwt_token",
+      "value": ""
+    }
+  ]
+}

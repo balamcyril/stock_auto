@@ -76,6 +76,12 @@ jobs:
           # Disable PCRE JIT for PHP CLI to avoid memory/security warnings
           PHP_OPTIONS="-d pcre.jit=0"
           
+          # Generate JWT keypair if missing
+          if [ ! -f config/jwt/private.pem ] || [ ! -f config/jwt/public.pem ]; then
+            mkdir -p config/jwt
+            APP_ENV=prod JWT_PASSPHRASE="${{ secrets.JWT_PASSPHRASE }}" php $PHP_OPTIONS bin/console lexik:jwt:generate-keypair --overwrite --no-interaction
+          fi
+          
           # Generate optimized .env.prod.php for production
           APP_ENV=prod php $PHP_OPTIONS /usr/local/bin/composer dump-env prod
           
