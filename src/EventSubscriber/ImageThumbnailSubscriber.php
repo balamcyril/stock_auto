@@ -1,17 +1,13 @@
 <?php
 namespace App\EventSubscriber;
 
+use App\Entity\ProductImage;
+use App\Entity\Brand;
+use App\Entity\Category;
+use App\Entity\SubCategory;
 use App\Service\ImageThumbnailGenerator;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
-use App\Entity\Actualite;
-use App\Entity\Agenda;
-use App\Entity\Artiste;
-use App\Entity\Contenu;
-use App\Entity\Formation;
-use App\Entity\Galerie;
-use App\Entity\UnitePedagogique;
-use App\Entity\UniteRecherche;
 
 class ImageThumbnailSubscriber implements EventSubscriber
 {
@@ -30,81 +26,32 @@ class ImageThumbnailSubscriber implements EventSubscriber
     {
         $entity = $args->getObject();
 
-        if ($entity instanceof Actualite) {
+        if ($entity instanceof ProductImage) {
+            $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage(), 'thumbnail_small', 'uploads/products');
             $entity->setImageThumbnail(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage())
+                $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage(), 'thumbnail_medium', 'uploads/products')
             );
         }
-        if ($entity instanceof Agenda) {
+
+        if ($entity instanceof Brand) {
+            $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage(), 'thumbnail_small', 'uploads/brands');
             $entity->setImageThumbnail(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage(),'thumbnail_800x570','uploads/agendas')
+                $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage(), 'thumbnail_medium', 'uploads/brands')
             );
         }
 
-        if ($entity instanceof UnitePedagogique) {
-            $entity->setImage1Thumbnail(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage1(),'thumbnail_800x570','uploads/unite_pedagogiques')
-            );
-
-            $entity->setImage2Thumbnail(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage2(),'thumbnail_800x570','uploads/unite_pedagogiques')
+        if ($entity instanceof Category) {
+            $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage(), 'thumbnail_small', 'uploads/categories');
+            $entity->setImageThumbnail(
+                $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage(), 'thumbnail_medium', 'uploads/categories')
             );
         }
 
-        if ($entity instanceof UniteRecherche) {
-            $entity->setImage1Thumbnail(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage1(),'thumbnail_800x570','uploads/unite_recherche')
-            );
-
-            $entity->setImage2Thumbnail(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage2(),'thumbnail_800x570','uploads/unite_recherche')
+        if ($entity instanceof SubCategory) {
+            $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage(), 'thumbnail_small', 'uploads/sub_categories');
+            $entity->setImageThumbnail(
+                $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage(), 'thumbnail_medium', 'uploads/sub_categories')
             );
         }
-
-        if ($entity instanceof Formation) {
-            $entity->setImage1Thumbnail(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage1(),'thumbnail_800x570','uploads/formations')
-            );
-
-            $entity->setImage2Thumbnail(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage2(),'thumbnail_800x570','uploads/formations')
-            );
-        }
-
-        if ($entity instanceof Contenu) {
-            $entity->setImage1Thumbnail(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage1(),'thumbnail_800x570','uploads/contenus')
-            );
-
-            $entity->setImage2Thumbnail(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getImage2(),'thumbnail_800x570','uploads/contenus')
-            );
-        }
-
-        if ($entity instanceof Artiste) {
-            $entity->setPhotoThumbnail1(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getPhoto1(),'thumbnail_800x570','uploads/artistes')
-            );
-            $entity->setPhotoThumbnail2(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getPhoto2(),'thumbnail_800x570','uploads/artistes')
-            );
-            $entity->setPhotoThumbnail3(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getPhoto3(),'thumbnail_800x570','uploads/artistes')
-            );
-            $entity->setPhotoThumbnail4(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getPhoto4(),'thumbnail_800x570','uploads/artistes')
-            );
-            $entity->setPhotoThumbnail5(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getPhoto5(),'thumbnail_800x570','uploads/artistes')
-            );
-        }
-
-        if ($entity instanceof Galerie) {
-            $entity->setMediaThumbnail(
-                $this->thumbnailGenerator->generateThumbnailUrl($entity->getMedia(),'thumbnail_800x570','uploads/galeries')
-            );
-        }
-        
-        
     }
 }

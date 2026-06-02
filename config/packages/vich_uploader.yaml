@@ -2,66 +2,34 @@ vich_uploader:
     db_driver: orm
 
     mappings:
-        contenu_images:
-            uri_prefix: /uploads/contenus
-            upload_destination: '%kernel.project_dir%/public/uploads/contenus'
+        product_images:
+            uri_prefix: /uploads/products
+            upload_destination: '%kernel.project_dir%/public/uploads/products'
             namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
             inject_on_load: false
             delete_on_update: true
             delete_on_remove: true
 
-        unite_pedagogique_images:
-            uri_prefix: /uploads/unite_pedagogiques
-            upload_destination: '%kernel.project_dir%/public/uploads/unite_pedagogiques'
+        category_images:
+            uri_prefix: /uploads/categories
+            upload_destination: '%kernel.project_dir%/public/uploads/categories'
             namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true
 
-        formation_images:
-            uri_prefix: /uploads/formations
-            upload_destination: '%kernel.project_dir%/public/uploads/formations'
+        sub_category_images:
+            uri_prefix: /uploads/sub_categories
+            upload_destination: '%kernel.project_dir%/public/uploads/sub_categories'
             namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true
 
-        unite_recherche_images:
-            uri_prefix: /uploads/unite_recherche
-            upload_destination: '%kernel.project_dir%/public/uploads/unite_recherche'
+        brand_images:
+            uri_prefix: /uploads/brands
+            upload_destination: '%kernel.project_dir%/public/uploads/brands'
             namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
-
-        actualite_images:
-            uri_prefix: /uploads/actualites
-            upload_destination: '%kernel.project_dir%/public/uploads/actualites'
-            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
-
-        agenda_images:
-            uri_prefix: /uploads/agendas
-            upload_destination: '%kernel.project_dir%/public/uploads/agendas'
-            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
-
-        artiste_images1:
-            uri_prefix: /uploads/artistes
-            upload_destination: '%kernel.project_dir%/public/uploads/artistes'
-            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
-        artiste_images2:
-            uri_prefix: /uploads/artistes
-            upload_destination: '%kernel.project_dir%/public/uploads/artistes'
-            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
-        artiste_images3:
-            uri_prefix: /uploads/artistes
-            upload_destination: '%kernel.project_dir%/public/uploads/artistes'
-            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
-        artiste_images4:
-            uri_prefix: /uploads/artistes
-            upload_destination: '%kernel.project_dir%/public/uploads/artistes'
-            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
-        artiste_images5:
-            uri_prefix: /uploads/artistes
-            upload_destination: '%kernel.project_dir%/public/uploads/artistes'
-            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
-
-        galerie_files:
-            uri_prefix: /uploads/galeries
-            upload_destination: '%kernel.project_dir%/public/uploads/galeries'
-            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
-            
-        pieces_jointes:
-            uri_prefix: /uploads/pieces_jointes
-            upload_destination: '%kernel.project_dir%/public/uploads/pieces_jointes'
-            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true

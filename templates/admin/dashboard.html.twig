@@ -1,160 +1,62 @@
-{# templates/admin/dashboard.html.twig #}
-
 {% extends '@EasyAdmin/layout.html.twig' %}
 
+{% macro stat_card(title, value, controller, details) %}
+    <div class="col-md-3 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ title }}</h5>
+                <p class="card-text mb-1">Nombre total: {{ value }}</p>
+                {% if details %}
+                    <p class="text-muted small mb-2">{{ details }}</p>
+                {% endif %}
+                {% if controller %}
+                    <a href="{{ ea_url().setController(controller).setAction('index') }}">Voir les details</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% import _self as dashboard %}
+
 {% block content %}
-    <div class="container">
+    <div class="container-fluid">
+        <h2 class="mb-4">Stock Auto</h2>
+
+        <h4 class="mb-3">Indicateurs stock et ventes</h4>
         <div class="row">
-            {# Card pour Type de Contenu #}
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Type de Contenu</h5>
-                        <p class="card-text">Nombre total: {{ typeContenuCount }}</p>
-                        <a href="{{ ea_url()
-                                    .setController('App\\Controller\\Admin\\TypeContenuCrudController')
-                                    .setAction('index')
-                                }}">
-                                Voir les détails
-                        </a>
-
-                    </div>
-                </div>
-            </div>
-
-            {# Card pour Contenu #}
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Contenu</h5>
-                        <p class="card-text">Nombre total: {{ contenuCount }}</p>
-                        <a href="{{ ea_url()
-                                    .setController('App\\Controller\\Admin\\ContenuCrudController')
-                                    .setAction('index')
-                                }}">
-                                Voir les détails
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            {# Card pour Liens #}
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Texte annexe</h5>
-                        <p class="card-text">Nombre total: {{ lienCount }}</p>
-                        <a href="{{ ea_url()
-                                    .setController('App\\Controller\\Admin\\LienCrudController')
-                                    .setAction('index')
-                                }}">
-                                Voir les détails
-                        </a>
-                    </div>
-                </div>
-            </div>
+            {{ dashboard.stat_card('Pièces actives', activeProductCount, 'App\\Controller\\Admin\\ProductCrudController', productCount ~ ' pièces au total') }}
+            {{ dashboard.stat_card('Stock bas', lowStockProductCount, 'App\\Controller\\Admin\\ProductCrudController', outOfStockProductCount ~ ' pièces en rupture') }}
+            {{ dashboard.stat_card('Valeur du stock', stockValue|number_format(2, ',', ' ') ~ ' EUR', 'App\\Controller\\Admin\\ProductCrudController', 'Prix x quantité disponible') }}
+            {{ dashboard.stat_card('Commandes à traiter', pendingOrderCount, 'App\\Controller\\Admin\\OrderCrudController', orderCount ~ ' commandes au total') }}
+            {{ dashboard.stat_card('CA payé', paidRevenue|number_format(2, ',', ' ') ~ ' EUR', 'App\\Controller\\Admin\\OrderCrudController', 'Commandes marquées payées') }}
+            {{ dashboard.stat_card('Paiements en attente', pendingPaymentCount, 'App\\Controller\\Admin\\PaymentCrudController', paymentCount ~ ' paiements au total') }}
+            {{ dashboard.stat_card('Mouvements de stock', stockMovementCount, 'App\\Controller\\Admin\\StockMovementCrudController', 'Historique entrées / sorties') }}
+            {{ dashboard.stat_card('Utilisateurs', userCount, 'App\\Controller\\Admin\\UserCrudController', cartCount ~ ' paniers créés') }}
         </div>
 
+        <h4 class="mb-3 mt-4">Catalogue</h4>
         <div class="row">
-
-            {# Card pour Actualités #}
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Actualités/Blog</h5>
-                        <p class="card-text">Nombre total: {{ actualiteCount }}</p>
-                        <a href="{{ ea_url()
-                                    .setController('App\\Controller\\Admin\\ActualiteCrudController')
-                                    .setAction('index')
-                                }}">
-                                Voir les détails
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            {# Card pour Agenda #}
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Actualités/Blog</h5>
-                        <p class="card-text">Nombre total: {{ agendaCount }}</p>
-                         <a href="{{ ea_url()
-                                    .setController('App\\Controller\\Admin\\AgendaCrudController')
-                                    .setAction('index')
-                                }}">
-                                Voir les détails
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            {# Card pour Type d'Artiste #}
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Categorie Jeux et Animations</h5>
-                        <p class="card-text">Nombre total: {{ typeArtisteCount }}</p>
-                        <a href="{{ ea_url()
-                                    .setController('App\\Controller\\Admin\\TypeArtisteCrudController')
-                                    .setAction('index')
-                                }}">
-                                Voir les détails
-                        </a>
-                    </div>
-                </div>
-            </div>
+            {{ dashboard.stat_card('Pièces', productCount, 'App\\Controller\\Admin\\ProductCrudController', '5 emplacements photo par pièce') }}
+            {{ dashboard.stat_card('Marques', brandCount, 'App\\Controller\\Admin\\BrandCrudController', null) }}
+            {{ dashboard.stat_card('Catégories', categoryCount, 'App\\Controller\\Admin\\CategoryCrudController', subCategoryCount ~ ' sous-catégories') }}
+            {{ dashboard.stat_card('Sous-catégories', subCategoryCount, 'App\\Controller\\Admin\\SubCategoryCrudController', null) }}
         </div>
 
+        <h4 class="mb-3 mt-4">Logistique</h4>
         <div class="row">
-            {# Card pour Artistes #}
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Jeux et Animations</h5>
-                        <p class="card-text">Nombre total: {{ artisteCount }}</p>
-                        <a href="{{ ea_url()
-                                    .setController('App\\Controller\\Admin\\ArtisteCrudController')
-                                    .setAction('index')
-                                }}">
-                                Voir les détails
-                        </a>
-                    </div>
-                </div>
-            </div>
+            {{ dashboard.stat_card('Entrepôts', warehouseCount, 'App\\Controller\\Admin\\WarehouseCrudController', productLocationCount ~ ' emplacements') }}
+            {{ dashboard.stat_card('Emplacements produits', productLocationCount, 'App\\Controller\\Admin\\ProductLocationCrudController', null) }}
+            {{ dashboard.stat_card('Points de retrait', pickupLocationCount, 'App\\Controller\\Admin\\PickupLocationCrudController', null) }}
+        </div>
 
-            {# Card pour Type de Galerie #}
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Types / Catégories</h5>
-                        <p class="card-text">Nombre total: {{ typeGalerieCount }}</p>
-                        <a href="{{ ea_url()
-                                    .setController('App\\Controller\\Admin\\TypeGalerieCrudController')
-                                    .setAction('index')
-                                }}">
-                                Voir les détails
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            {# Card pour Galeries #}
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Bons Plans</h5>
-                        <p class="card-text">Nombre total: {{ galerieCount }}</p>
-                        <a href="{{ ea_url()
-                                    .setController('App\\Controller\\Admin\\GalerieCrudController')
-                                    .setAction('index')
-                                }}">
-                                Voir les détails
-                        </a>
-                    </div>
-                </div>
-            </div>
-
+        <h4 class="mb-3 mt-4">Ventes</h4>
+        <div class="row">
+            {{ dashboard.stat_card('Paniers', cartCount, 'App\\Controller\\Admin\\CartCrudController', cartItemCount ~ ' articles panier') }}
+            {{ dashboard.stat_card('Articles panier', cartItemCount, 'App\\Controller\\Admin\\CartItemCrudController', null) }}
+            {{ dashboard.stat_card('Commandes', orderCount, 'App\\Controller\\Admin\\OrderCrudController', orderItemCount ~ ' articles commande') }}
+            {{ dashboard.stat_card('Articles commande', orderItemCount, 'App\\Controller\\Admin\\OrderItemCrudController', null) }}
+            {{ dashboard.stat_card('Paiements', paymentCount, 'App\\Controller\\Admin\\PaymentCrudController', null) }}
         </div>
     </div>
 {% endblock %}

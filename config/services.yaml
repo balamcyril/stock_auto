@@ -23,11 +23,6 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-    App\Service\ImageThumbnailGenerator:
-        arguments:
-            $cacheManager: '@liip_imagine.cache.manager'
-            $urlGenerator: '@router.default'
-
     App\EventSubscriber\ImageThumbnailSubscriber:
         tags:
-            - { name: doctrine.event_subscriber }
+            - { name: 'doctrine.event_subscriber' }

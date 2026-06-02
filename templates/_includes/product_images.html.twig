@@ -1,0 +1,67 @@
+{# Macro pour afficher images produit
+   Usage:
+   {% import '_includes/product_images.html.twig' as product_images %}
+   {{ product_images.render(product, 'index') }}  {# petite vignette #}
+   {{ product_images.render(product, 'detail') }} {# carousel medium #}
+#}
+
+{% macro render(product, context) %}
+    {% if product is null %}
+        {{- '' -}}
+    {% else %}
+        {% set images = product.getImages() %}
+        {% if context == 'index' %}
+            {# Affiche la première image disponible en thumbnail_small #}
+            {% set first = null %}
+            {% for img in images %}
+                {% if img and img.getImage() %}
+                    {% set first = img %}
+                    {% break %}
+                {% endif %}
+            {% endfor %}
+
+            {% if first %}
+                {% set thumb = first.getImageThumbnail() ?: ('/media/cache/resolve/thumbnail_small/uploads/products/' ~ first.getImage()) %}
+                <img src="{{ thumb }}" alt="{{ product.getName() }}" style="max-height:80px;" />
+            {% else %}
+                {{- '' -}}
+            {% endif %}
+        {% elseif context == 'detail' %}
+            {# Carousel bootstrap si plusieurs images, sinon image medium #}
+            {% set imgs = [] %}
+            {% for img in images %}
+                {% if img and img.getImage() %}
+                    {% set imgs = imgs|merge([img]) %}
+                {% endif %}
+            {% endfor %}
+
+            {% if imgs|length == 0 %}
+                {{- '' -}}
+            {% elseif imgs|length == 1 %}
+                {% set first = imgs[0] %}
+                {% set url = first.getImageThumbnail() ?: ('/media/cache/resolve/thumbnail_medium/uploads/products/' ~ first.getImage()) %}
+                <img src="{{ url }}" alt="{{ product.getName() }}" class="img-fluid" />
+            {% else %}
+                {% set carousel_id = 'prod_car_' ~ (product.getId() ?: random(100000)) %}
+                <div id="{{ carousel_id }}" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for img in imgs %}
+                            {% set url = img.getImageThumbnail() ?: ('/media/cache/resolve/thumbnail_medium/uploads/products/' ~ img.getImage()) %}
+                            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                <img src="{{ url }}" class="d-block w-100" alt="{{ product.getName() }}" />
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#{{ carousel_id }}" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Précédent</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#{{ carousel_id }}" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Suivant</span>
+                    </button>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endmacro %}

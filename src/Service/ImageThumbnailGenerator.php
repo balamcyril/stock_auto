@@ -16,19 +16,32 @@ class ImageThumbnailGenerator
      * Génère l'URL d'un thumbnail
      */
     public function generateThumbnailUrl(
-        ?string $imagePath, 
-        string $filterName = 'thumbnail_800x570',
-        string $uploadsDir = 'uploads/actualites'
+        ?string $imagePath,
+        string $filterName = 'thumbnail_medium',
+        string $uploadsDir = 'uploads/products'
     ): ?string {
         if (empty($imagePath)) {
             return null;
         }
 
-        // Chemin relatif vers l'image originale
-        $fullImagePath = $uploadsDir.'/'.$imagePath;
+        $fullImagePath = ltrim($uploadsDir.'/'.$imagePath, '/');
 
-        // Génère le thumbnail via LiipImagine
-        return $this->cacheManager->generateUrl($fullImagePath, $filterName);
+        try {
+            return $this->cacheManager->getBrowserPath($fullImagePath, $filterName);
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    public function getOriginalImageUrl(
+        ?string $imagePath,
+        string $uploadsDir = 'uploads/products'
+    ): ?string {
+        if (empty($imagePath)) {
+            return null;
+        }
+
+        return '/' . trim($uploadsDir, '/') . '/' . ltrim($imagePath, '/');
     }
 
     /**
@@ -36,8 +49,8 @@ class ImageThumbnailGenerator
      */
     public function generateAbsoluteThumbnailUrl(
         ?string $imagePath,
-        string $filterName = 'thumbnail_800x570',
-        string $uploadsDir = 'uploads/actualites'
+        string $filterName = 'thumbnail_medium',
+        string $uploadsDir = 'uploads/products'
     ): ?string {
         if (empty($imagePath)) {
             return null;
@@ -47,8 +60,8 @@ class ImageThumbnailGenerator
         $filteredPath = $this->cacheManager->getBrowserPath($relativePath, $filterName);
 
         return $this->urlGenerator->generate(
-            'app_home', 
-            [], 
+            'app_home',
+            [],
             UrlGeneratorInterface::ABSOLUTE_URL
         ).ltrim($filteredPath, '/');
     }
