@@ -26,7 +26,26 @@ jobs:
           sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} << 'EOF'
           set -e
           
-          cd ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+          
+          # Configure git globally for deployment user
+          git config --global user.email "deploy@github.com"
+          git config --global user.name "GitHub Deploy"
+          
+          # Create deploy directory if it doesn't exist
+          if [ ! -d "$DEPLOY_PATH" ]; then
+            echo "Creating deployment directory: $DEPLOY_PATH"
+            mkdir -p "$DEPLOY_PATH"
+            cd "$DEPLOY_PATH"
+            git init
+            git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            git fetch origin
+            git checkout ${{ github.ref_name }}
+          else
+            cd "$DEPLOY_PATH"
+            # Update remote URL in case it changed
+            git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          fi
           
           # Backup uploaded files before git pull
           echo "Backing up uploaded files..."
@@ -74,41 +93,3 @@ jobs:
           
           echo "Deployment completed successfully!"
           EOF
-
-      - name: Slack notification on success
-        if: success()
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          webhook-url: ${{ secrets.SLACK_WEBHOOK }}
-          payload: |
-            {
-              "text": "✅ Deployment successful",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Deployment Successful*\nProject: `stock_auto`\nBranch: `${{ github.ref_name }}`\nCommit: `${{ github.sha }}`"
-                  }
-                }
-              ]
-            }
-
-      - name: Slack notification on failure
-        if: failure()
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          webhook-url: ${{ secrets.SLACK_WEBHOOK }}
-          payload: |
-            {
-              "text": "❌ Deployment failed",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Deployment Failed*\nProject: `stock_auto`\nBranch: `${{ github.ref_name }}`\nCommit: `${{ github.sha }}`"
-                  }
-                }
-              ]
-            }
