@@ -27,6 +27,7 @@ jobs:
           set -e
           
           DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+          SSH_PASSWORD="${{ secrets.SSH_PASSWORD }}"
           
           # Configure git globally for deployment user
           git config --global user.email "deploy@github.com"
@@ -35,7 +36,8 @@ jobs:
           # Create deploy directory if it doesn't exist
           if [ ! -d "$DEPLOY_PATH" ]; then
             echo "Creating deployment directory: $DEPLOY_PATH"
-            mkdir -p "$DEPLOY_PATH"
+            echo "$SSH_PASSWORD" | sudo -S mkdir -p "$DEPLOY_PATH"
+            echo "$SSH_PASSWORD" | sudo -S chown -R $(whoami):$(whoami) "$DEPLOY_PATH"
             cd "$DEPLOY_PATH"
             git init
             git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
