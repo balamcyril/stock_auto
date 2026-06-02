@@ -1,0 +1,114 @@
+name: Deploy to Ubuntu Server
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH connection
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+          sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Deploy to server
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} -p ${{ secrets.SSH_PORT }} << 'EOF'
+          set -e
+          
+          cd ${{ secrets.DEPLOY_PATH }}
+          
+          # Backup uploaded files before git pull
+          echo "Backing up uploaded files..."
+          BACKUP_DIR="/tmp/uploads_backup_$(date +%s)"
+          mkdir -p "$BACKUP_DIR"
+          if [ -d "public/uploads" ]; then
+            cp -r public/uploads/* "$BACKUP_DIR/" 2>/dev/null || true
+          fi
+          
+          # Pull latest code
+          git fetch origin
+          git checkout ${{ github.ref_name }}
+          git pull origin ${{ github.ref_name }}
+          
+          # Restore uploaded files
+          echo "Restoring uploaded files..."
+          mkdir -p public/uploads/products
+          mkdir -p public/uploads/categories
+          mkdir -p public/uploads/sub_categories
+          mkdir -p public/uploads/brands
+          
+          if [ -d "$BACKUP_DIR" ]; then
+            cp -r "$BACKUP_DIR"/* public/uploads/ 2>/dev/null || true
+            rm -rf "$BACKUP_DIR"
+          fi
+          
+          # Install dependencies
+          composer install --no-dev --optimize-autoloader
+          npm ci
+          npm run build
+          
+          # Generate optimized .env.prod.php for production
+          composer dump-env prod
+          
+          # Clear cache
+          php bin/console cache:clear --env=prod
+          
+          # Run migrations if needed
+          php bin/console doctrine:migrations:migrate --no-interaction --env=prod
+          
+          # Fix permissions
+          chmod -R 755 public/
+          chmod -R 777 var/
+          chmod -R 777 public/uploads/
+          
+          echo "Deployment completed successfully!"
+          EOF
+
+      - name: Slack notification on success
+        if: success()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK }}
+          payload: |
+            {
+              "text": "✅ Deployment successful",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Deployment Successful*\nProject: `stock_auto`\nBranch: `${{ github.ref_name }}`\nCommit: `${{ github.sha }}`"
+                  }
+                }
+              ]
+            }
+
+      - name: Slack notification on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK }}
+          payload: |
+            {
+              "text": "❌ Deployment failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Deployment Failed*\nProject: `stock_auto`\nBranch: `${{ github.ref_name }}`\nCommit: `${{ github.sha }}`"
+                  }
+                }
+              ]
+            }
