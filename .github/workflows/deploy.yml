@@ -57,10 +57,10 @@ jobs:
             cp -r public/uploads/* "\$BACKUP_DIR/" 2>/dev/null || true
           fi
           
-          # Pull latest code
+          # Pull latest code - clean local modifications first
           git fetch origin
-          git checkout ${{ github.ref_name }}
-          git pull origin ${{ github.ref_name }}
+          git reset --hard origin/${{ github.ref_name }}
+          git clean -fd
           
           # Fix permissions on entire directory after git pull
           echo "\$SSH_PASSWORD" | sudo -S chmod -R 777 "\$DEPLOY_PATH"
