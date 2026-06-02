@@ -85,22 +85,26 @@ jobs:
           CORS_ALLOW_ORIGIN="${{ secrets.CORS_ALLOW_ORIGIN }}"
           SECRETS_EOF
           
+          # Disable PCRE JIT for PHP CLI to avoid memory/security warnings
+          PHP_OPTIONS="-d pcre.jit=0"
+          COMPOSER_BIN="$(command -v composer)"
+          
           # Clean vendor and reinstall for production (removes dev dependencies)
           rm -rf vendor/
           
           # Install dependencies for production only
-          composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+          php $PHP_OPTIONS "$COMPOSER_BIN" install --no-dev --no-interaction --prefer-dist --optimize-autoloader
           npm ci
           npm run build
           
           # Generate optimized .env.prod.php for production
-          APP_ENV=prod composer dump-env prod
+          APP_ENV=prod php $PHP_OPTIONS "$COMPOSER_BIN" dump-env prod
           
           # Clear cache
-          APP_ENV=prod php bin/console cache:clear
+          APP_ENV=prod php $PHP_OPTIONS bin/console cache:clear
           
           # Run migrations if needed
-          APP_ENV=prod php bin/console doctrine:migrations:migrate --no-interaction
+          APP_ENV=prod php $PHP_OPTIONS bin/console doctrine:migrations:migrate --no-interaction
           
           # Fix permissions
           chmod -R 755 public/
