@@ -26,3 +26,6 @@ services:
     App\EventSubscriber\ImageThumbnailSubscriber:
         tags:
             - { name: 'doctrine.event_subscriber' }
+    App\EventSubscriber\JWTAuthenticationSuccessSubscriber:
+        arguments:
+            $tokenTtl: '%lexik_jwt_authentication.token_ttl%'
