@@ -3,27 +3,41 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['warehouse:read'], 'enable_max_depth' => true],
+    denormalizationContext: ['groups' => ['warehouse:write']]
+)]
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'ipartial', 'city' => 'ipartial', 'address' => 'ipartial'])]
+#[ApiFilter(OrderFilter::class, properties: ['name', 'city', 'id'])]
 class Warehouse
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
+    #[Groups(['warehouse:read', 'warehouse:write', 'product:read', 'product_location:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['warehouse:read', 'warehouse:write', 'product:read', 'product_location:read'])]
     private string $name = '';
 
     #[ORM\Column(type: 'text')]
+    #[Groups(['warehouse:read', 'warehouse:write'])]
     private string $address = '';
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['warehouse:read', 'warehouse:write', 'product:read'])]
     private string $city = '';
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(['warehouse:read'])]
     private \DateTime $createdAt;
 
     public function __construct()

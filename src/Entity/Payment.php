@@ -3,10 +3,20 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['payment:read'], 'enable_max_depth' => true],
+    denormalizationContext: ['groups' => ['payment:write']]
+)]
+#[ApiFilter(SearchFilter::class, properties: ['method' => 'exact', 'status' => 'exact', 'provider' => 'ipartial', 'transactionId' => 'partial', 'order.orderNumber' => 'exact'])]
+#[ApiFilter(OrderFilter::class, properties: ['createdAt', 'updatedAt', 'amount', 'status'])]
 class Payment
 {
     public const METHOD_CARD = 'card';
@@ -31,31 +41,41 @@ class Payment
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
+    #[Groups(['payment:read', 'payment:write'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Order::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[MaxDepth(2)]
+    #[Groups(['payment:read', 'payment:write'])]
     private ?Order $order = null;
 
     #[ORM\Column(type: 'string', length: 30)]
+    #[Groups(['payment:read', 'payment:write'])]
     private string $method = self::METHOD_CARD;
 
     #[ORM\Column(type: 'string', length: 80, nullable: true)]
+    #[Groups(['payment:read', 'payment:write'])]
     private ?string $provider = null;
 
     #[ORM\Column(type: 'string', length: 30)]
+    #[Groups(['payment:read', 'payment:write'])]
     private string $status = self::STATUS_PENDING;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
+    #[Groups(['payment:read', 'payment:write'])]
     private string $amount = '0.00';
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['payment:read', 'payment:write'])]
     private ?string $transactionId = null;
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(['payment:read'])]
     private \DateTime $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['payment:read'])]
     private ?\DateTime $updatedAt = null;
 
     public function __construct()

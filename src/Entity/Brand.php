@@ -3,27 +3,39 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['brand:read'], 'enable_max_depth' => true],
+    denormalizationContext: ['groups' => ['brand:write']]
+)]
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'ipartial'])]
+#[ApiFilter(OrderFilter::class, properties: ['name', 'id'])]
 #[Vich\Uploadable]
 class Brand
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
+    #[Groups(['brand:read', 'brand:write', 'product:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['brand:read', 'brand:write', 'product:read'])]
     private string $name = '';
 
     #[Vich\UploadableField(mapping: 'brand_images', fileNameProperty: 'image')]
     private ?File $imageFile = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['brand:read', 'brand:write'])]
     private ?string $image = null;
 
     /**
@@ -32,6 +44,7 @@ class Brand
     private ?string $imageThumbnail = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['brand:read'])]
     private ?\DateTime $updatedAt = null;
 
     public function getId(): ?int

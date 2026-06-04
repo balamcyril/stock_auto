@@ -3,29 +3,41 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['category:read'], 'enable_max_depth' => true],
+    denormalizationContext: ['groups' => ['category:write']]
+)]
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'ipartial'])]
+#[ApiFilter(OrderFilter::class, properties: ['name', 'id'])]
 #[Vich\Uploadable]
 class Category
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
+    #[Groups(['category:read', 'category:write', 'product:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['category:read', 'category:write', 'product:read'])]
     private string $name = '';
 
     #[Vich\UploadableField(mapping: 'category_images', fileNameProperty: 'image')]
     private ?File $imageFile = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['category:read', 'category:write'])]
     private ?string $image = null;
 
     /**
@@ -34,9 +46,11 @@ class Category
     private ?string $imageThumbnail = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: SubCategory::class, cascade: ['persist'], orphanRemoval: false)]
+    #[Groups(['category:read'])]
     private Collection $subCategories;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['category:read'])]
     private ?\DateTime $updatedAt = null;
 
     public function __construct()

@@ -1,0 +1,76 @@
+{% extends '@EasyAdmin/crud/detail.html.twig' %}
+
+{% block main %}
+    {{ parent() }}
+
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Preparation commande</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-lg-4">
+                    <div class="p-3 bg-light rounded">
+                        <div class="text-muted small">Adresse d'expedition</div>
+                        <div class="fw-semibold">{{ entity.instance.shippingAddress ?? 'Non renseignee' }}</div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <div class="p-3 bg-light rounded">
+                        <div class="text-muted small">Mode de traitement</div>
+                        <div class="fw-semibold">{{ entity.instance.fulfillmentType }}</div>
+                        {% if entity.instance.pickupLocation %}
+                            <div class="small text-muted">Retrait: {{ entity.instance.pickupLocation.name }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <div class="p-3 bg-light rounded">
+                        <div class="text-muted small">Poids total</div>
+                        <div class="fw-semibold">{{ totalWeightKg|number_format(2, ',', ' ') }} kg</div>
+                    </div>
+                </div>
+            </div>
+
+            <h6 class="mb-3">Lignes de preparation</h6>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Produit</th>
+                        <th>Marque</th>
+                        <th>Catégorie</th>
+                        <th>Sous-catégorie</th>
+                        <th class="text-end">Qté</th>
+                        <th class="text-end">Prix unit.</th>
+                        <th class="text-end">Poids unitaire</th>
+                        <th class="text-end">Poids ligne</th>
+                        <th>Volume</th>
+                        <th>Emplacement</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for line in packingLines %}
+                        <tr>
+                            <td>{{ line.sku }}</td>
+                            <td>{{ line.name }}</td>
+                            <td>{{ line.brand ?: '-' }}</td>
+                            <td>{{ line.category ?: '-' }}</td>
+                            <td>{{ line.subCategory ?: '-' }}</td>
+                            <td class="text-end">{{ line.quantity }}</td>
+                            <td class="text-end">{{ line.unitPrice|number_format(2, ',', ' ') }} EUR</td>
+                            <td class="text-end">{{ line.weightKg is not null ? line.weightKg|number_format(2, ',', ' ') ~ ' kg' : '-' }}</td>
+                            <td class="text-end">{{ line.lineWeightKg is not null ? line.lineWeightKg|number_format(2, ',', ' ') ~ ' kg' : '-' }}</td>
+                            <td>{{ line.volumeSize ?: '-' }}</td>
+                            <td>{{ line.shelfCode ?: '-' }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="11" class="text-center text-muted">Aucune ligne de commande.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -3,30 +3,45 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['pickup_location:read'], 'enable_max_depth' => true],
+    denormalizationContext: ['groups' => ['pickup_location:write']]
+)]
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'ipartial', 'city' => 'ipartial', 'address' => 'ipartial', 'openingHours' => 'ipartial'])]
+#[ApiFilter(OrderFilter::class, properties: ['name', 'city', 'id'])]
 class PickupLocation
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
+    #[Groups(['pickup_location:read', 'pickup_location:write', 'order:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['pickup_location:read', 'pickup_location:write', 'order:read'])]
     private string $name = '';
 
     #[ORM\Column(type: 'text')]
+    #[Groups(['pickup_location:read', 'pickup_location:write'])]
     private string $address = '';
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['pickup_location:read', 'pickup_location:write'])]
     private string $city = '';
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['pickup_location:read', 'pickup_location:write'])]
     private ?string $openingHours = null;
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(['pickup_location:read'])]
     private \DateTime $createdAt;
 
     public function __construct()

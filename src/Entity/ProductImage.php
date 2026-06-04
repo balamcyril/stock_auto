@@ -3,28 +3,42 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['product_image:read'], 'enable_max_depth' => true],
+    denormalizationContext: ['groups' => ['product_image:write']]
+)]
+#[ApiFilter(SearchFilter::class, properties: ['image' => 'partial', 'product.name' => 'ipartial', 'product.sku' => 'exact'])]
+#[ApiFilter(OrderFilter::class, properties: ['sortOrder', 'createdAt', 'id'])]
 #[Vich\Uploadable]
 class ProductImage
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
+    #[Groups(['product_image:read', 'product:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Product::class, inversedBy: 'images')]
     #[ORM\JoinColumn(nullable: false)]
+    #[MaxDepth(2)]
+    #[Groups(['product_image:read', 'product_image:write'])]
     private ?Product $product = null;
 
     #[Vich\UploadableField(mapping: 'product_images', fileNameProperty: 'image')]
     private ?File $imageFile = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['product_image:read', 'product_image:write', 'product:read'])]
     private ?string $image = null;
 
     /**
@@ -33,15 +47,19 @@ class ProductImage
     private ?string $imageThumbnail = null;
 
     #[ORM\Column(type: 'boolean')]
+    #[Groups(['product_image:read', 'product_image:write', 'product:read'])]
     private bool $isPrimary = false;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['product_image:read', 'product_image:write', 'product:read'])]
     private int $sortOrder = 1;
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(['product_image:read'])]
     private \DateTime $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['product_image:read'])]
     private ?\DateTime $updatedAt = null;
 
     public function __construct()

@@ -3,15 +3,25 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: '`order`')]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['order:read'], 'enable_max_depth' => true],
+    denormalizationContext: ['groups' => ['order:write']]
+)]
+#[ApiFilter(SearchFilter::class, properties: ['orderNumber' => 'exact', 'status' => 'exact', 'paymentStatus' => 'exact', 'fulfillmentType' => 'exact', 'user.email' => 'exact'])]
+#[ApiFilter(OrderFilter::class, properties: ['createdAt', 'updatedAt', 'totalAmount', 'orderNumber', 'status', 'paymentStatus'])]
 class Order
 {
     public const STATUS_PENDING = 'pending';
@@ -49,40 +59,55 @@ class Order
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
+    #[Groups(['order:read', 'order:write'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[MaxDepth(2)]
+    #[Groups(['order:read', 'order:write'])]
     private ?User $user = null;
 
     #[ORM\Column(type: 'string', length: 80, unique: true)]
+    #[Groups(['order:read', 'order:write'])]
     private string $orderNumber = '';
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
+    #[Groups(['order:read', 'order:write'])]
     private string $totalAmount = '0.00';
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['order:read', 'order:write'])]
     private ?string $shippingAddress = null;
 
     #[ORM\Column(type: 'string', length: 30)]
+    #[Groups(['order:read', 'order:write'])]
     private string $status = self::STATUS_PENDING;
 
     #[ORM\Column(type: 'string', length: 30)]
+    #[Groups(['order:read', 'order:write'])]
     private string $paymentStatus = self::PAYMENT_PENDING;
 
     #[ORM\Column(type: 'string', length: 30)]
+    #[Groups(['order:read', 'order:write'])]
     private string $fulfillmentType = self::FULFILLMENT_DELIVERY;
 
     #[ORM\ManyToOne(targetEntity: PickupLocation::class)]
+    #[MaxDepth(2)]
+    #[Groups(['order:read', 'order:write'])]
     private ?PickupLocation $pickupLocation = null;
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(['order:read'])]
     private \DateTime $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['order:read'])]
     private ?\DateTime $updatedAt = null;
 
     #[ORM\OneToMany(mappedBy: 'order', targetEntity: OrderItem::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[MaxDepth(2)]
+    #[Groups(['order:read'])]
     private Collection $items;
 
     public function __construct()

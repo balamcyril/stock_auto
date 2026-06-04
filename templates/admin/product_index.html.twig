@@ -1,0 +1,27 @@
+{% extends '@EasyAdmin/crud/index.html.twig' %}
+
+{% block main %}
+    <div class="mb-3">
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-12 col-md-8 col-xl-6">
+                <input
+                    type="text"
+                    name="query"
+                    value="{{ app.request.query.get('query') }}"
+                    class="form-control"
+                    placeholder="Rechercher par SKU, nom, marque, categorie, entrepot..."
+                >
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Rechercher</button>
+            </div>
+            {% if app.request.query.get('query') %}
+                <div class="col-auto">
+                    <a href="{{ path(app.request.attributes.get('_route')) }}" class="btn btn-outline-secondary">Effacer</a>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+
+    {{ parent() }}
+{% endblock %}

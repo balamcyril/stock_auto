@@ -29,3 +29,5 @@ services:
     App\EventSubscriber\JWTAuthenticationSuccessSubscriber:
         arguments:
             $tokenTtl: '%lexik_jwt_authentication.token_ttl%'
+    App\Controller\Api\ProductSearchController:
+        tags: ['controller.service_arguments']

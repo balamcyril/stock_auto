@@ -3,33 +3,51 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity]
 #[ORM\Table(name: '`order_item`')]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['order_item:read'], 'enable_max_depth' => true],
+    denormalizationContext: ['groups' => ['order_item:write']]
+)]
+#[ApiFilter(SearchFilter::class, properties: ['product.name' => 'ipartial', 'product.sku' => 'exact', 'order.orderNumber' => 'exact'])]
+#[ApiFilter(OrderFilter::class, properties: ['quantity', 'unitPrice', 'createdAt', 'id'])]
 class OrderItem
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
+    #[Groups(['order_item:read', 'order_item:write', 'order:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Order::class, inversedBy: 'items')]
     #[ORM\JoinColumn(nullable: false)]
+    #[MaxDepth(2)]
+    #[Groups(['order_item:read', 'order_item:write'])]
     private ?Order $order = null;
 
     #[ORM\ManyToOne(targetEntity: Product::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[MaxDepth(2)]
+    #[Groups(['order_item:read', 'order_item:write', 'order:read'])]
     private ?Product $product = null;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['order_item:read', 'order_item:write', 'order:read'])]
     private int $quantity = 1;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
+    #[Groups(['order_item:read', 'order_item:write', 'order:read'])]
     private string $unitPrice = '0.00';
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(['order_item:read'])]
     private \DateTime $createdAt;
 
     public function __construct()

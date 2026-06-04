@@ -3,14 +3,23 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: '`user`')]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['user:read'], 'enable_max_depth' => true],
+    denormalizationContext: ['groups' => ['user:write']]
+)]
+#[ApiFilter(SearchFilter::class, properties: ['firstName' => 'ipartial', 'lastName' => 'ipartial', 'email' => 'exact', 'phone' => 'partial', 'role' => 'exact'])]
+#[ApiFilter(OrderFilter::class, properties: ['createdAt', 'updatedAt', 'email', 'firstName', 'lastName'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public const ROLE_CUSTOMER = 'customer';
@@ -26,15 +35,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
+    #[Groups(['user:read', 'user:write', 'cart:read', 'order:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 120)]
+    #[Groups(['user:read', 'user:write'])]
     private string $firstName = '';
 
     #[ORM\Column(type: 'string', length: 120)]
+    #[Groups(['user:read', 'user:write'])]
     private string $lastName = '';
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Groups(['user:read', 'user:write'])]
     private string $email = '';
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -42,15 +55,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $passwordHash = '';
 
     #[ORM\Column(type: 'string', length: 40, nullable: true)]
+    #[Groups(['user:read', 'user:write'])]
     private ?string $phone = null;
 
     #[ORM\Column(type: 'string', length: 30)]
+    #[Groups(['user:read', 'user:write'])]
     private string $role = self::ROLE_CUSTOMER;
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(['user:read'])]
     private \DateTime $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['user:read'])]
     private ?\DateTime $updatedAt = null;
 
     public function __construct()

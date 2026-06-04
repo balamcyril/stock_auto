@@ -1,17 +1,24 @@
 {% extends '@EasyAdmin/layout.html.twig' %}
 
-{% macro stat_card(title, value, controller, details) %}
-    <div class="col-md-3 mb-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">{{ title }}</h5>
-                <p class="card-text mb-1">Nombre total: {{ value }}</p>
-                {% if details %}
-                    <p class="text-muted small mb-2">{{ details }}</p>
-                {% endif %}
-                {% if controller %}
-                    <a href="{{ ea_url().setController(controller).setAction('index') }}">Voir les details</a>
-                {% endif %}
+{% macro stat_card(title, value, details, controller, icon, tone) %}
+    <div class="col-12 col-md-6 col-xxl-3 mb-3">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body d-flex align-items-start gap-3">
+                <div class="rounded-3 d-flex align-items-center justify-content-center bg-{{ tone }}-subtle text-{{ tone }}" style="width: 3rem; height: 3rem;">
+                    <i class="fa {{ icon }} fa-lg"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="text-muted small mb-1">{{ title }}</div>
+                    <div class="fs-4 fw-semibold lh-1">{{ value }}</div>
+                    {% if details %}
+                        <div class="text-muted small mt-2">{{ details }}</div>
+                    {% endif %}
+                    {% if controller %}
+                        <a class="small d-inline-block mt-2 text-decoration-none" href="{{ ea_url().setController(controller).setAction('index') }}">
+                            Ouvrir la liste
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -21,42 +28,90 @@
 
 {% block content %}
     <div class="container-fluid">
-        <h2 class="mb-4">Stock Auto</h2>
-
-        <h4 class="mb-3">Indicateurs stock et ventes</h4>
-        <div class="row">
-            {{ dashboard.stat_card('Pièces actives', activeProductCount, 'App\\Controller\\Admin\\ProductCrudController', productCount ~ ' pièces au total') }}
-            {{ dashboard.stat_card('Stock bas', lowStockProductCount, 'App\\Controller\\Admin\\ProductCrudController', outOfStockProductCount ~ ' pièces en rupture') }}
-            {{ dashboard.stat_card('Valeur du stock', stockValue|number_format(2, ',', ' ') ~ ' EUR', 'App\\Controller\\Admin\\ProductCrudController', 'Prix x quantité disponible') }}
-            {{ dashboard.stat_card('Commandes à traiter', pendingOrderCount, 'App\\Controller\\Admin\\OrderCrudController', orderCount ~ ' commandes au total') }}
-            {{ dashboard.stat_card('CA payé', paidRevenue|number_format(2, ',', ' ') ~ ' EUR', 'App\\Controller\\Admin\\OrderCrudController', 'Commandes marquées payées') }}
-            {{ dashboard.stat_card('Paiements en attente', pendingPaymentCount, 'App\\Controller\\Admin\\PaymentCrudController', paymentCount ~ ' paiements au total') }}
-            {{ dashboard.stat_card('Mouvements de stock', stockMovementCount, 'App\\Controller\\Admin\\StockMovementCrudController', 'Historique entrées / sorties') }}
-            {{ dashboard.stat_card('Utilisateurs', userCount, 'App\\Controller\\Admin\\UserCrudController', cartCount ~ ' paniers créés') }}
+        <div class="mb-4">
+            <h2 class="mb-1">Stock Auto</h2>
+            <div class="text-muted">Vue d'ensemble orientee operation: pieces, stock, paniers, commandes et alertes utiles.</div>
         </div>
 
-        <h4 class="mb-3 mt-4">Catalogue</h4>
         <div class="row">
-            {{ dashboard.stat_card('Pièces', productCount, 'App\\Controller\\Admin\\ProductCrudController', '5 emplacements photo par pièce') }}
-            {{ dashboard.stat_card('Marques', brandCount, 'App\\Controller\\Admin\\BrandCrudController', null) }}
-            {{ dashboard.stat_card('Catégories', categoryCount, 'App\\Controller\\Admin\\CategoryCrudController', subCategoryCount ~ ' sous-catégories') }}
-            {{ dashboard.stat_card('Sous-catégories', subCategoryCount, 'App\\Controller\\Admin\\SubCategoryCrudController', null) }}
+            {{ dashboard.stat_card('Pieces actives', activeProductCount, productCount ~ ' pieces au total', 'App\\Controller\\Admin\\ProductCrudController', 'fa-cogs', 'primary') }}
+            {{ dashboard.stat_card('Stock faible', lowStockProductCount, outOfStockProductCount ~ ' pieces en rupture', 'App\\Controller\\Admin\\ProductCrudController', 'fa-exclamation-triangle', 'warning') }}
+            {{ dashboard.stat_card('Valeur du stock', stockValue|number_format(2, ',', ' ') ~ ' EUR', 'Prix x quantite disponible', 'App\\Controller\\Admin\\ProductCrudController', 'fa-euro-sign', 'success') }}
+            {{ dashboard.stat_card('Commandes a traiter', pendingOrderCount, orderCount ~ ' commandes au total', 'App\\Controller\\Admin\\OrderCrudController', 'fa-box-open', 'info') }}
+            {{ dashboard.stat_card('CA paye', paidRevenue|number_format(2, ',', ' ') ~ ' EUR', 'Commandes avec paiement valide', 'App\\Controller\\Admin\\OrderCrudController', 'fa-chart-line', 'success') }}
+            {{ dashboard.stat_card('Paiements en attente', pendingPaymentCount, paymentCount ~ ' paiements au total', 'App\\Controller\\Admin\\PaymentCrudController', 'fa-credit-card', 'secondary') }}
+            {{ dashboard.stat_card('Mouvements de stock', stockMovementCount, 'Entrees, sorties et corrections', 'App\\Controller\\Admin\\StockMovementCrudController', 'fa-exchange-alt', 'dark') }}
+            {{ dashboard.stat_card('Utilisateurs', userCount, cartCount ~ ' paniers crees', 'App\\Controller\\Admin\\UserCrudController', 'fa-users', 'primary') }}
         </div>
 
-        <h4 class="mb-3 mt-4">Logistique</h4>
-        <div class="row">
-            {{ dashboard.stat_card('Entrepôts', warehouseCount, 'App\\Controller\\Admin\\WarehouseCrudController', productLocationCount ~ ' emplacements') }}
-            {{ dashboard.stat_card('Emplacements produits', productLocationCount, 'App\\Controller\\Admin\\ProductLocationCrudController', null) }}
-            {{ dashboard.stat_card('Points de retrait', pickupLocationCount, 'App\\Controller\\Admin\\PickupLocationCrudController', null) }}
-        </div>
+        <div class="row mt-2">
+            <div class="col-12 col-xl-4 mb-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <div class="text-muted small">Panier</div>
+                                <div class="fw-semibold">Suivi des paniers</div>
+                            </div>
+                            <i class="fa fa-shopping-cart text-primary"></i>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <div class="d-flex justify-content-between align-items-center"><span>Actif</span><strong>{{ activeCartCount }}</strong></div>
+                            <div class="d-flex justify-content-between align-items-center"><span>Converti</span><strong>{{ convertedCartCount }}</strong></div>
+                            <div class="d-flex justify-content-between align-items-center"><span>Abandonne</span><strong>{{ abandonedCartCount }}</strong></div>
+                            <div class="d-flex justify-content-between align-items-center"><span>Total paniers</span><strong>{{ cartCount }}</strong></div>
+                            <div class="d-flex justify-content-between align-items-center"><span>Articles panier</span><strong>{{ cartItemCount }}</strong></div>
+                        </div>
+                        <div class="mt-3 small text-muted">Les paniers actifs et abandonnes aident a mesurer l'intention d'achat et les relances.</div>
+                    </div>
+                </div>
+            </div>
 
-        <h4 class="mb-3 mt-4">Ventes</h4>
-        <div class="row">
-            {{ dashboard.stat_card('Paniers', cartCount, 'App\\Controller\\Admin\\CartCrudController', cartItemCount ~ ' articles panier') }}
-            {{ dashboard.stat_card('Articles panier', cartItemCount, 'App\\Controller\\Admin\\CartItemCrudController', null) }}
-            {{ dashboard.stat_card('Commandes', orderCount, 'App\\Controller\\Admin\\OrderCrudController', orderItemCount ~ ' articles commande') }}
-            {{ dashboard.stat_card('Articles commande', orderItemCount, 'App\\Controller\\Admin\\OrderItemCrudController', null) }}
-            {{ dashboard.stat_card('Paiements', paymentCount, 'App\\Controller\\Admin\\PaymentCrudController', null) }}
+            <div class="col-12 col-xl-4 mb-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <div class="text-muted small">Commande</div>
+                                <div class="fw-semibold">Suivi des commandes</div>
+                            </div>
+                            <i class="fa fa-box-open text-info"></i>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <div class="d-flex justify-content-between align-items-center"><span>A traiter</span><strong>{{ pendingOrderCount }}</strong></div>
+                            <div class="d-flex justify-content-between align-items-center"><span>Prête a envoyer</span><strong>{{ readyToShipOrderCount }}</strong></div>
+                            <div class="d-flex justify-content-between align-items-center"><span>Envoyee</span><strong>{{ shippedOrderCount }}</strong></div>
+                            <div class="d-flex justify-content-between align-items-center"><span>Livree</span><strong>{{ deliveredOrderCount }}</strong></div>
+                            <div class="d-flex justify-content-between align-items-center"><span>Archivee</span><strong>{{ archivedOrderCount }}</strong></div>
+                            <div class="d-flex justify-content-between align-items-center"><span>Total commandes</span><strong>{{ orderCount }}</strong></div>
+                        </div>
+                        <div class="mt-3 small text-muted">Cette section donne le rythme du traitement: attente, preparation, expedition et cloture.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-xl-4 mb-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <div class="text-muted small">Stock et logistique</div>
+                                <div class="fw-semibold">Points de controle</div>
+                            </div>
+                            <i class="fa fa-warehouse text-success"></i>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <div class="d-flex justify-content-between align-items-center"><span>Entrepots</span><strong>{{ warehouseCount }}</strong></div>
+                            <div class="d-flex justify-content-between align-items-center"><span>Emplacements produits</span><strong>{{ productLocationCount }}</strong></div>
+                            <div class="d-flex justify-content-between align-items-center"><span>Points de retrait</span><strong>{{ pickupLocationCount }}</strong></div>
+                            <div class="d-flex justify-content-between align-items-center"><span>Marques</span><strong>{{ brandCount }}</strong></div>
+                            <div class="d-flex justify-content-between align-items-center"><span>Categories</span><strong>{{ categoryCount }}</strong></div>
+                            <div class="d-flex justify-content-between align-items-center"><span>Sous-categories</span><strong>{{ subCategoryCount }}</strong></div>
+                        </div>
+                        <div class="mt-3 small text-muted">Cette vue aide a verifier la couverture stock et la structure catalogue.</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
