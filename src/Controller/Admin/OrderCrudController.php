@@ -50,6 +50,7 @@ class OrderCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Commande')
             ->setEntityLabelInPlural('Commandes')
+            ->setPaginatorPageSize(20)
             ->overrideTemplate('crud/detail', 'admin/order_detail.html.twig');
     }
 

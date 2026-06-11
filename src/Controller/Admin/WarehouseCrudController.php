@@ -29,7 +29,8 @@ class WarehouseCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setEntityLabelInSingular('Entrepôt')->setEntityLabelInPlural('Entrepôts');
+        return $crud->setEntityLabelInSingular('Entrepôt')->setEntityLabelInPlural('Entrepôts')
+            ->setPaginatorPageSize(20);
     }
 
     public function configureActions(Actions $actions): Actions

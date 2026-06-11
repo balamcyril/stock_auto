@@ -32,7 +32,8 @@ class StockMovementCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setEntityLabelInSingular('Mouvement de stock')->setEntityLabelInPlural('Mouvements de stock');
+        return $crud->setEntityLabelInSingular('Mouvement de stock')->setEntityLabelInPlural('Mouvements de stock')
+            ->setPaginatorPageSize(20);
     }
 
     public function configureActions(Actions $actions): Actions

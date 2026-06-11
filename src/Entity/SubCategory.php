@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -18,29 +19,30 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 )]
 #[ApiFilter(SearchFilter::class, properties: ['name' => 'ipartial', 'category.name' => 'ipartial'])]
 #[ApiFilter(OrderFilter::class, properties: ['name', 'id'])]
+#[ApiFilter(DateFilter::class, properties: ['updatedAt'])]
 #[Vich\Uploadable]
 class SubCategory
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
-    #[Groups(['sub_category:read', 'sub_category:write', 'product:read'])]
+    #[Groups(['sub_category:read', 'sub_category:write', 'product:read', 'product_image:read', 'stock_movement:read', 'product_location:read', 'category:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['sub_category:read', 'sub_category:write', 'product:read'])]
+    #[Groups(['sub_category:read', 'sub_category:write', 'product:read', 'product_image:read', 'stock_movement:read', 'product_location:read', 'category:read'])]
     private string $name = '';
 
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'subCategories')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['sub_category:read', 'sub_category:write'])]
+    #[Groups(['sub_category:read', 'sub_category:write', 'product:read', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private ?Category $category = null;
 
     #[Vich\UploadableField(mapping: 'sub_category_images', fileNameProperty: 'image')]
     private ?File $imageFile = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['sub_category:read', 'sub_category:write'])]
+    #[Groups(['sub_category:read', 'sub_category:write', 'product:read', 'product_image:read', 'stock_movement:read', 'product_location:read', 'category:read'])]
     private ?string $image = null;
 
     /**
@@ -49,7 +51,7 @@ class SubCategory
     private ?string $imageThumbnail = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    #[Groups(['sub_category:read'])]
+    #[Groups(['sub_category:read', 'product:read', 'product_image:read', 'stock_movement:read', 'product_location:read', 'category:read'])]
     private ?\DateTime $updatedAt = null;
 
     public function getId(): ?int { return $this->id; }

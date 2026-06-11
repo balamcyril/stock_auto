@@ -29,7 +29,8 @@ class ProductLocationCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setEntityLabelInSingular('Emplacement produit')->setEntityLabelInPlural('Emplacements produits');
+        return $crud->setEntityLabelInSingular('Emplacement produit')->setEntityLabelInPlural('Emplacements produits')
+            ->setPaginatorPageSize(20);
     }
 
     public function configureActions(Actions $actions): Actions

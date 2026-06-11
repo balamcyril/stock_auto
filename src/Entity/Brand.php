@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -18,24 +19,25 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 )]
 #[ApiFilter(SearchFilter::class, properties: ['name' => 'ipartial'])]
 #[ApiFilter(OrderFilter::class, properties: ['name', 'id'])]
+#[ApiFilter(DateFilter::class, properties: ['updatedAt'])]
 #[Vich\Uploadable]
 class Brand
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
-    #[Groups(['brand:read', 'brand:write', 'product:read'])]
+    #[Groups(['brand:read', 'brand:write', 'product:read', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['brand:read', 'brand:write', 'product:read'])]
+    #[Groups(['brand:read', 'brand:write', 'product:read', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private string $name = '';
 
     #[Vich\UploadableField(mapping: 'brand_images', fileNameProperty: 'image')]
     private ?File $imageFile = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['brand:read', 'brand:write'])]
+    #[Groups(['brand:read', 'brand:write', 'product:read', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private ?string $image = null;
 
     /**
@@ -44,7 +46,7 @@ class Brand
     private ?string $imageThumbnail = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    #[Groups(['brand:read'])]
+    #[Groups(['brand:read', 'product:read', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private ?\DateTime $updatedAt = null;
 
     public function getId(): ?int

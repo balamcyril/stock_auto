@@ -49,7 +49,8 @@ class SubCategoryCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setEntityLabelInSingular('Sous-catégorie')->setEntityLabelInPlural('Sous-catégories');
+        return $crud->setEntityLabelInSingular('Sous-catégorie')->setEntityLabelInPlural('Sous-catégories')
+            ->setPaginatorPageSize(20);
     }
 
     public function configureActions(Actions $actions): Actions

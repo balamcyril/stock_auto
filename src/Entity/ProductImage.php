@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -19,6 +21,8 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 )]
 #[ApiFilter(SearchFilter::class, properties: ['image' => 'partial', 'product.name' => 'ipartial', 'product.sku' => 'exact'])]
 #[ApiFilter(OrderFilter::class, properties: ['sortOrder', 'createdAt', 'id'])]
+#[ApiFilter(BooleanFilter::class, properties: ['isPrimary'])]
+#[ApiFilter(DateFilter::class, properties: ['createdAt', 'updatedAt'])]
 #[Vich\Uploadable]
 class ProductImage
 {

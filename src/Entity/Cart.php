@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -19,6 +20,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 )]
 #[ApiFilter(SearchFilter::class, properties: ['status' => 'exact', 'user.email' => 'exact'])]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt', 'updatedAt', 'status', 'id'])]
+#[ApiFilter(DateFilter::class, properties: ['createdAt', 'updatedAt'])]
 class Cart
 {
     public const STATUS_ACTIVE = 'active';
@@ -34,13 +36,13 @@ class Cart
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
-    #[Groups(['cart:read', 'cart:write'])]
+    #[Groups(['cart:read', 'cart:write', 'cart_item:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[MaxDepth(2)]
-    #[Groups(['cart:read', 'cart:write'])]
+    #[Groups(['cart:read', 'cart:write', 'cart_item:read'])]
     private ?User $user = null;
 
     #[ORM\Column(type: 'string', length: 30)]
@@ -48,11 +50,11 @@ class Cart
     private string $status = self::STATUS_ACTIVE;
 
     #[ORM\Column(type: 'datetime')]
-    #[Groups(['cart:read'])]
+    #[Groups(['cart:read', 'cart_item:read'])]
     private \DateTime $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    #[Groups(['cart:read'])]
+    #[Groups(['cart:read', 'cart_item:read'])]
     private ?\DateTime $updatedAt = null;
 
     #[ORM\OneToMany(mappedBy: 'cart', targetEntity: CartItem::class, cascade: ['persist', 'remove'], orphanRemoval: true)]

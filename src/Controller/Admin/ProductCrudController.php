@@ -201,6 +201,7 @@ class ProductCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Pièce')
             ->setEntityLabelInPlural('Pièces')
+            ->setPaginatorPageSize(20)
             ->overrideTemplate('crud/index', 'admin/product_index.html.twig');
     }
 

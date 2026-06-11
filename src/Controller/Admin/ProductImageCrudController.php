@@ -56,6 +56,7 @@ class ProductImageCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setEntityLabelInSingular('Image produit')->setEntityLabelInPlural('Images produits');
+        return $crud->setEntityLabelInSingular('Image produit')->setEntityLabelInPlural('Images produits')
+            ->setPaginatorPageSize(20);
     }
 }

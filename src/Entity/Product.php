@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
@@ -34,7 +36,9 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
     'status' => 'exact',
     'volumeSize' => 'exact',
 ])]
-#[ApiFilter(OrderFilter::class, properties: ['name', 'price', 'quantity', 'createdAt', 'updatedAt'])]
+#[ApiFilter(OrderFilter::class, properties: ['id', 'name', 'price', 'quantity', 'createdAt', 'updatedAt', 'status'])]
+#[ApiFilter(RangeFilter::class, properties: ['price', 'quantity', 'weightKg'])]
+#[ApiFilter(DateFilter::class, properties: ['createdAt', 'updatedAt'])]
 class Product
 {
     public const VOLUME_VERY_SMALL = 'very_small';
@@ -64,81 +68,81 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
-    #[Groups(['product:read', 'product:write', 'product_image:read', 'cart_item:read', 'order_item:read'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'cart_item:read', 'order_item:read', 'stock_movement:read', 'product_location:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 80, unique: true)]
-    #[Groups(['product:read', 'product:write', 'cart_item:read', 'order_item:read'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'cart_item:read', 'order_item:read', 'stock_movement:read', 'product_location:read'])]
     private string $sku = '';
 
     #[ORM\Column(type: 'string', length: 80, nullable: true)]
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private ?string $barcode = null;
 
     #[ORM\Column(type: 'string', length: 120, nullable: true)]
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private ?string $oemReference = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['product:read', 'product:write', 'cart_item:read', 'order_item:read'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'cart_item:read', 'order_item:read', 'stock_movement:read', 'product_location:read'])]
     private string $name = '';
 
     #[ORM\ManyToOne(targetEntity: Brand::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[MaxDepth(2)]
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private ?Brand $brand = null;
 
     #[ORM\ManyToOne(targetEntity: Category::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[MaxDepth(2)]
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private ?Category $category = null;
 
     #[ORM\ManyToOne(targetEntity: SubCategory::class)]
     #[MaxDepth(2)]
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private ?SubCategory $subCategory = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private ?string $description = null;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
-    #[Groups(['product:read', 'product:write', 'cart_item:read', 'order_item:read'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'cart_item:read', 'order_item:read', 'stock_movement:read', 'product_location:read'])]
     private string $price = '0.00';
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private int $quantity = 0;
 
     #[ORM\Column(type: 'decimal', precision: 8, scale: 2, nullable: true)]
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private ?string $weightKg = null;
 
     #[ORM\Column(type: 'string', length: 30)]
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private string $volumeSize = self::VOLUME_SMALL;
 
     #[ORM\ManyToOne(targetEntity: Warehouse::class)]
     #[MaxDepth(2)]
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private ?Warehouse $warehouse = null;
 
     #[ORM\Column(type: 'string', length: 80, nullable: true)]
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private ?string $shelfCode = null;
 
     #[ORM\Column(type: 'string', length: 30)]
-    #[Groups(['product:read', 'product:write'])]
+    #[Groups(['product:read', 'product:write', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private string $status = self::STATUS_ACTIVE;
 
     #[ORM\Column(type: 'datetime')]
-    #[Groups(['product:read'])]
+    #[Groups(['product:read', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private \DateTime $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    #[Groups(['product:read'])]
+    #[Groups(['product:read', 'product_image:read', 'stock_movement:read', 'product_location:read'])]
     private ?\DateTime $updatedAt = null;
 
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: ProductImage::class, cascade: ['persist', 'remove'], orphanRemoval: true)]

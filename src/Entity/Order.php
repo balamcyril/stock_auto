@@ -3,7 +3,9 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,6 +24,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 )]
 #[ApiFilter(SearchFilter::class, properties: ['orderNumber' => 'exact', 'status' => 'exact', 'paymentStatus' => 'exact', 'fulfillmentType' => 'exact', 'user.email' => 'exact'])]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt', 'updatedAt', 'totalAmount', 'orderNumber', 'status', 'paymentStatus'])]
+#[ApiFilter(RangeFilter::class, properties: ['totalAmount'])]
+#[ApiFilter(DateFilter::class, properties: ['createdAt', 'updatedAt'])]
 class Order
 {
     public const STATUS_PENDING = 'pending';
@@ -59,37 +63,37 @@ class Order
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
-    #[Groups(['order:read', 'order:write'])]
+    #[Groups(['order:read', 'order:write', 'payment:read', 'order_item:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[MaxDepth(2)]
-    #[Groups(['order:read', 'order:write'])]
+    #[Groups(['order:read', 'order:write', 'payment:read', 'order_item:read'])]
     private ?User $user = null;
 
     #[ORM\Column(type: 'string', length: 80, unique: true)]
-    #[Groups(['order:read', 'order:write'])]
+    #[Groups(['order:read', 'order:write', 'payment:read', 'order_item:read'])]
     private string $orderNumber = '';
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
-    #[Groups(['order:read', 'order:write'])]
+    #[Groups(['order:read', 'order:write', 'payment:read', 'order_item:read'])]
     private string $totalAmount = '0.00';
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['order:read', 'order:write'])]
+    #[Groups(['order:read', 'order:write', 'payment:read', 'order_item:read'])]
     private ?string $shippingAddress = null;
 
     #[ORM\Column(type: 'string', length: 30)]
-    #[Groups(['order:read', 'order:write'])]
+    #[Groups(['order:read', 'order:write', 'payment:read', 'order_item:read'])]
     private string $status = self::STATUS_PENDING;
 
     #[ORM\Column(type: 'string', length: 30)]
-    #[Groups(['order:read', 'order:write'])]
+    #[Groups(['order:read', 'order:write', 'payment:read', 'order_item:read'])]
     private string $paymentStatus = self::PAYMENT_PENDING;
 
     #[ORM\Column(type: 'string', length: 30)]
-    #[Groups(['order:read', 'order:write'])]
+    #[Groups(['order:read', 'order:write', 'payment:read', 'order_item:read'])]
     private string $fulfillmentType = self::FULFILLMENT_DELIVERY;
 
     #[ORM\ManyToOne(targetEntity: PickupLocation::class)]
@@ -98,11 +102,11 @@ class Order
     private ?PickupLocation $pickupLocation = null;
 
     #[ORM\Column(type: 'datetime')]
-    #[Groups(['order:read'])]
+    #[Groups(['order:read', 'payment:read', 'order_item:read'])]
     private \DateTime $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    #[Groups(['order:read'])]
+    #[Groups(['order:read', 'payment:read', 'order_item:read'])]
     private ?\DateTime $updatedAt = null;
 
     #[ORM\OneToMany(mappedBy: 'order', targetEntity: OrderItem::class, cascade: ['persist', 'remove'], orphanRemoval: true)]

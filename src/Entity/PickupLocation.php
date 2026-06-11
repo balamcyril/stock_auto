@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -16,32 +17,33 @@ use Symfony\Component\Serializer\Annotation\Groups;
 )]
 #[ApiFilter(SearchFilter::class, properties: ['name' => 'ipartial', 'city' => 'ipartial', 'address' => 'ipartial', 'openingHours' => 'ipartial'])]
 #[ApiFilter(OrderFilter::class, properties: ['name', 'city', 'id'])]
+#[ApiFilter(DateFilter::class, properties: ['createdAt'])]
 class PickupLocation
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
-    #[Groups(['pickup_location:read', 'pickup_location:write', 'order:read'])]
+    #[Groups(['pickup_location:read', 'pickup_location:write', 'order:read', 'payment:read', 'order_item:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['pickup_location:read', 'pickup_location:write', 'order:read'])]
+    #[Groups(['pickup_location:read', 'pickup_location:write', 'order:read', 'payment:read', 'order_item:read'])]
     private string $name = '';
 
     #[ORM\Column(type: 'text')]
-    #[Groups(['pickup_location:read', 'pickup_location:write'])]
+    #[Groups(['pickup_location:read', 'pickup_location:write', 'order:read', 'payment:read', 'order_item:read'])]
     private string $address = '';
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['pickup_location:read', 'pickup_location:write'])]
+    #[Groups(['pickup_location:read', 'pickup_location:write', 'order:read', 'payment:read', 'order_item:read'])]
     private string $city = '';
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['pickup_location:read', 'pickup_location:write'])]
+    #[Groups(['pickup_location:read', 'pickup_location:write', 'order:read', 'payment:read', 'order_item:read'])]
     private ?string $openingHours = null;
 
     #[ORM\Column(type: 'datetime')]
-    #[Groups(['pickup_location:read'])]
+    #[Groups(['pickup_location:read', 'order:read', 'payment:read', 'order_item:read'])]
     private \DateTime $createdAt;
 
     public function __construct()

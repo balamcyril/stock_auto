@@ -3,7 +3,9 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
@@ -17,6 +19,8 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 )]
 #[ApiFilter(SearchFilter::class, properties: ['type' => 'exact', 'reason' => 'ipartial', 'product.name' => 'ipartial', 'product.sku' => 'exact'])]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt', 'quantity', 'type'])]
+#[ApiFilter(RangeFilter::class, properties: ['quantity'])]
+#[ApiFilter(DateFilter::class, properties: ['createdAt'])]
 class StockMovement
 {
     public const TYPE_IN = 'in';

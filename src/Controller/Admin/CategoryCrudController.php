@@ -47,7 +47,8 @@ class CategoryCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setEntityLabelInSingular('Catégorie')->setEntityLabelInPlural('Catégories');
+        return $crud->setEntityLabelInSingular('Catégorie')->setEntityLabelInPlural('Catégories')
+            ->setPaginatorPageSize(20);
     }
 
     public function configureActions(Actions $actions): Actions

@@ -30,7 +30,8 @@ class PickupLocationCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setEntityLabelInSingular('Point de retrait')->setEntityLabelInPlural('Points de retrait');
+        return $crud->setEntityLabelInSingular('Point de retrait')->setEntityLabelInPlural('Points de retrait')
+            ->setPaginatorPageSize(20);
     }
 
     public function configureActions(Actions $actions): Actions

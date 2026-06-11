@@ -35,7 +35,8 @@ class PaymentCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setEntityLabelInSingular('Paiement')->setEntityLabelInPlural('Paiements');
+        return $crud->setEntityLabelInSingular('Paiement')->setEntityLabelInPlural('Paiements')
+            ->setPaginatorPageSize(20);
     }
 
     public function configureActions(Actions $actions): Actions

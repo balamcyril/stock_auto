@@ -3,7 +3,9 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
@@ -18,6 +20,8 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 )]
 #[ApiFilter(SearchFilter::class, properties: ['product.name' => 'ipartial', 'product.sku' => 'exact', 'order.orderNumber' => 'exact'])]
 #[ApiFilter(OrderFilter::class, properties: ['quantity', 'unitPrice', 'createdAt', 'id'])]
+#[ApiFilter(RangeFilter::class, properties: ['quantity', 'unitPrice'])]
+#[ApiFilter(DateFilter::class, properties: ['createdAt'])]
 class OrderItem
 {
     #[ORM\Id]

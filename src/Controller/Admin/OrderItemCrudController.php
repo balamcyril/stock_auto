@@ -31,7 +31,8 @@ class OrderItemCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setEntityLabelInSingular('Article commande')->setEntityLabelInPlural('Articles commande');
+        return $crud->setEntityLabelInSingular('Article commande')->setEntityLabelInPlural('Articles commande')
+            ->setPaginatorPageSize(20);
     }
 
     public function configureActions(Actions $actions): Actions

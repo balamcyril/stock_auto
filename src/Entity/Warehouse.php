@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -16,28 +17,29 @@ use Symfony\Component\Serializer\Annotation\Groups;
 )]
 #[ApiFilter(SearchFilter::class, properties: ['name' => 'ipartial', 'city' => 'ipartial', 'address' => 'ipartial'])]
 #[ApiFilter(OrderFilter::class, properties: ['name', 'city', 'id'])]
+#[ApiFilter(DateFilter::class, properties: ['createdAt'])]
 class Warehouse
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
-    #[Groups(['warehouse:read', 'warehouse:write', 'product:read', 'product_location:read'])]
+    #[Groups(['warehouse:read', 'warehouse:write', 'product:read', 'product_image:read', 'product_location:read', 'stock_movement:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['warehouse:read', 'warehouse:write', 'product:read', 'product_location:read'])]
+    #[Groups(['warehouse:read', 'warehouse:write', 'product:read', 'product_image:read', 'product_location:read', 'stock_movement:read'])]
     private string $name = '';
 
     #[ORM\Column(type: 'text')]
-    #[Groups(['warehouse:read', 'warehouse:write'])]
+    #[Groups(['warehouse:read', 'warehouse:write', 'product:read', 'product_image:read', 'product_location:read', 'stock_movement:read'])]
     private string $address = '';
 
     #[ORM\Column(type: 'string', length: 255)]
-    #[Groups(['warehouse:read', 'warehouse:write', 'product:read'])]
+    #[Groups(['warehouse:read', 'warehouse:write', 'product:read', 'product_image:read', 'product_location:read', 'stock_movement:read'])]
     private string $city = '';
 
     #[ORM\Column(type: 'datetime')]
-    #[Groups(['warehouse:read'])]
+    #[Groups(['warehouse:read', 'product:read', 'product_image:read', 'product_location:read', 'stock_movement:read'])]
     private \DateTime $createdAt;
 
     public function __construct()

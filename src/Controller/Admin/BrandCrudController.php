@@ -47,7 +47,8 @@ class BrandCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setEntityLabelInSingular('Marque')->setEntityLabelInPlural('Marques');
+        return $crud->setEntityLabelInSingular('Marque')->setEntityLabelInPlural('Marques')
+            ->setPaginatorPageSize(20);
     }
 
     public function configureActions(Actions $actions): Actions

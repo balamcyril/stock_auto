@@ -33,7 +33,8 @@ class CartCrudController extends AbstractCrudController
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setEntityLabelInSingular('Panier')->setEntityLabelInPlural('Paniers');
+        return $crud->setEntityLabelInSingular('Panier')->setEntityLabelInPlural('Paniers')
+            ->setPaginatorPageSize(20);
     }
 
     public function configureActions(Actions $actions): Actions
